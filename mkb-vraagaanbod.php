@@ -151,10 +151,10 @@ function mkbvraagaanbod_main() {
 		// Link to user page is not very clean, but couldn't find the clean solution quick enough
 		$result = $result . '
 			<div class="mkbvraagaanbodentry">
-				<div class="mkbvraagaanbod_user"><a href="/members/' . $user->user_login . '">' . get_avatar($user->id) . $user->display_name . '</a></div>
 				<div class="mkbvraagaanbod_subject"><label>' . __('Subject') . ':</label>' . $row->subject . '</div>
+				<div class="mkbvraagaanbod_user"><a title="' . __('Bekijk profiel van') . ' ' . $user->display_name . '" href="/members/' . $user->user_login . '"><div>' . get_avatar($user->id) . '</div><div style="clear:both">' . $user->display_name . '</a><br/><a href="mailto:' . $user->user_email . '">' . __('Stuur email') . '</a></div></div>
 				<div class="mkbvraagaanbod_description"><label>' . __('Description') . ':</label>' . nl2br($row->description) . '</div>
-				<div class="mkbvraagaanbod_meta">' . __('Geldig tot') . ':' . date('l, F j, Y',$row->expires_on) . '</div>';
+				<div class="mkbvraagaanbod_meta">' . __('Loopt tot') . ' ' . date('l, F j, Y',$row->expires_on) . '</div>';
 		if (( $current_user->id == $row->user_id ) or ( $current_user->role == 'adminstrator' )) {
 			$result = $result . '
 				<form>
