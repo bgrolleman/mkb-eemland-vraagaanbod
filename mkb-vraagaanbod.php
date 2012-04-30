@@ -13,6 +13,8 @@ add_action('admin_menu', 'mkbvraagaanbod_add_page');
 
 $editor_role = get_role('editor'); $editor_role->add_cap('mkb_vraagaanbod');
 $admin_role = get_role('administrator'); $admin_role->add_cap('mkb_vraagaanbod');
+$admin_role = get_role('subscriber'); $admin_role->add_cap('mkb_vraagaanbod');
+$admin_role = get_role('eventmanager'); $admin_role->add_cap('mkb_vraagaanbod');
 //add_settings_field('duration','Duur advertentie', 'mkbvraagaanbod_duration', 'general');
 
 function mkbvraagaanbod_install() {
@@ -68,6 +70,24 @@ function mkbvraagaanbod_main() {
 	// Set a few variables
 	$current_user = wp_get_current_user();
 	$mkbvraagaanbod_table = $wpdb->prefix . "mkbvraagaanbod";
+
+	//
+	// Show Filter
+	$filter = $_REQUEST['vraagaanbod_filter'];
+	if ( $filter ) {
+		$filter_sql = "AND request_type = '$filter'";
+	} else {
+		$filter_sql = '';
+	}
+	?>
+	<div style="float: right"><form>
+		Filteren: <select name="vraagaanbod_filter" onchange="this.form.submit()">
+			<option value=""       <?php if ( $filter == '') { print "selected"; }?>>Alles</option>
+			<option value="vraag"  <?php if ( $filter == 'vraag' ) { print "selected"; }?>>Vraag</option>
+			<option value="aanbod" <?php if ( $filter == 'aanbod' ) { print "selected"; }?>>Aanbod</option>
+		</select>
+  </form></div>
+  <?php
 
 	// Users without this power shouldn't add stuff
 	if ( current_user_can('mkb_vraagaanbod')) {
@@ -136,22 +156,27 @@ function mkbvraagaanbod_main() {
 			}
 		}
 	}
-	//
 	// This is a simple plugin, so we just fetch all active rows and show them to the end user
 	$rows = $wpdb->get_results("
-		select id, user_id, subject, description, UNIX_TIMESTAMP(created_on) as created_on, UNIX_TIMESTAMP(expires_on) as expires_on, UNIX_TIMESTAMP(modified_on) as modified_on
+		select id, user_id, subject, description, UNIX_TIMESTAMP(created_on) as created_on, UNIX_TIMESTAMP(expires_on) as expires_on, UNIX_TIMESTAMP(modified_on) as modified_on, request_type
 		from $mkbvraagaanbod_table
 		where
 			expires_on >= NOW()
+			$filter_sql
 		order by
 			modified_on DESC;");
 	foreach($rows as $row) {
 		// This isn't very nice for the DB, might want to rewrite that later
 		$user = get_user_by('id',$row->user_id);
 		// Link to user page is not very clean, but couldn't find the clean solution quick enough
+		if ( $row->request_type == 'aanbod' ) {
+			$va_title = 'Aangeboden';
+		} else {
+		  $va_title = 'Gevraagd';
+		}
 		$result = $result . '
 			<div class="mkbvraagaanbodentry">
-				<div class="mkbvraagaanbod_subject"><label>' . __('Subject') . ':</label>' . $row->subject . '</div>
+				<div class="mkbvraagaanbod_subject"><label style="display:inline">' . __($va_title) . ':</label>' . $row->subject . '</div>
 				<div class="mkbvraagaanbod_user"><a title="' . __('Bekijk profiel van') . ' ' . $user->display_name . '" href="/members/' . $user->user_login . '"><div>' . get_avatar($user->id) . '</div><div style="clear:both">' . $user->display_name . '</a><br/><a href="mailto:' . $user->user_email . '">' . __('Stuur email') . '</a></div></div>
 				<div class="mkbvraagaanbod_description"><label>' . __('Description') . ':</label>' . nl2br($row->description) . '</div>
 				<div class="mkbvraagaanbod_meta">' . __('Loopt tot') . ' ' . date('l, F j, Y',$row->expires_on) . '</div>';
