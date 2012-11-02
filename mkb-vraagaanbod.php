@@ -41,12 +41,12 @@ function mkbvraagaanbod_print_form( $id = '', $subject = '', $description = '', 
 	<form>
 		<?php if ( $id ) { ?><input type="hidden" name="mkb_vraagaanbod_id" value="<?= $id ?>" /><?php } ?>
 		<label><?= __('Titel') ?></label>
-  		<input size="60" type="text" name="mkb_vraagaanbod_subject" value="<?= $subject ?>" />
+  		<input size="60" type="text" name="mkb_vraagaanbod_subject" value="<?= $subject ?>" /><br/>
 		<label><?= __('Soort') ?></label>
 			<input type="radio" name="mkb_vraagaanbod_type" value="vraag" <?php if ( $request_type=='vraag' ) { print "checked"; } ?> /> <?= __('Vraag') ?> 
-			<input type="radio" name="mkb_vraagaanbod_type" value="aanbod" <?php if ( $request_type=='aanbod' ) { print "checked"; } ?> /> <?= __('Aanbod') ?> 
+			<input type="radio" name="mkb_vraagaanbod_type" value="aanbod" <?php if ( $request_type=='aanbod' ) { print "checked"; } ?> /> <?= __('Aanbod') ?> <br/>
 		<label><?= __('Omschrijving') ?></label>
-  		<textarea rows="10" name="mkb_vraagaanbod_description"><?= $description ?></textarea>
+  		<textarea rows="10" name="mkb_vraagaanbod_description"><?= $description ?></textarea><br/>
 		<?php
 			if ( $id ) {
 				print '<input type="submit" name="mkb_vraagaanbod_submit" value="' . __('Aanpassen') . '" />';
@@ -177,7 +177,7 @@ function mkbvraagaanbod_main() {
 		$result = $result . '
 			<div class="mkbvraagaanbodentry">
 				<div class="mkbvraagaanbod_subject"><label style="display:inline">' . __($va_title) . ':</label>' . $row->subject . '</div>
-				<div class="mkbvraagaanbod_user"><a title="' . __('Bekijk profiel van') . ' ' . $user->display_name . '" href="/members/' . $user->user_login . '"><div>' . get_avatar($user->id) . '</div><div style="clear:both">' . $user->display_name . '</a><br/><a href="mailto:' . $user->user_email . '">' . __('Stuur email') . '</a></div></div>
+				<div class="mkbvraagaanbod_user"><a title="' . __('Bekijk profiel van') . ' ' . $user->display_name . '" href="/members/' . $user->user_login . '"><div>' . bg_get_avatar($user->id) . '</div><div style="clear:both">' . $user->display_name . '</a><br/><a href="mailto:' . $user->user_email . '">' . __('Stuur email') . '</a></div></div>
 				<div class="mkbvraagaanbod_description"><label>' . __('Description') . ':</label>' . nl2br($row->description) . '</div>
 				<div class="mkbvraagaanbod_meta">' . __('Loopt tot') . ' ' . date('l, F j, Y',$row->expires_on) . '</div>';
 		if (( $current_user->id == $row->user_id ) or ( $current_user->role == 'adminstrator' )) {
@@ -211,4 +211,5 @@ function mkbvraagaanbod_options_page() {
 	</div>
 	<?php
 }
+
 ?>
